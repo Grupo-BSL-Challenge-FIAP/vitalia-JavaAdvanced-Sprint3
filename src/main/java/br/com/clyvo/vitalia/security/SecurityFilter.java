@@ -1,7 +1,6 @@
 package br.com.clyvo.vitalia.security;
 
 import br.com.clyvo.vitalia.repository.AppUserRepository;
-import br.com.clyvo.vitalia.repository.RoleRepository;
 import br.com.clyvo.vitalia.service.TokenService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
