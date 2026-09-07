@@ -39,8 +39,8 @@ public class PetController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Busca um pet pelo ID")
-    public ResponseEntity<PetResponse> findById(@PathVariable Long id) {
-        return ResponseEntity.ok(service.findById(id));
+    public ResponseEntity<PetResponse> findById(@PathVariable Long id, @AuthenticationPrincipal AppUser user) {
+        return ResponseEntity.ok(service.findById(id, user));
     }
 
     @GetMapping("/search/name")
@@ -53,14 +53,14 @@ public class PetController {
     @PutMapping("/{id}")
     @Operation(summary = "Atualiza os dados de um pet")
     public ResponseEntity<PetResponse> update(
-            @PathVariable Long id, @RequestBody @Valid PetRequest request) {
-        return ResponseEntity.ok(service.update(id, request));
+            @PathVariable Long id, @RequestBody @Valid PetRequest request, @AuthenticationPrincipal AppUser user) {
+        return ResponseEntity.ok(service.update(id, request, user));
     }
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Remove um pet do sistema")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        service.delete(id);
+    public ResponseEntity<Void> delete(@PathVariable Long id, @AuthenticationPrincipal AppUser user) {
+        service.delete(id, user);
         return ResponseEntity.noContent().build();
     }
 

@@ -43,10 +43,11 @@ public class PetService {
         return repository.findAll(pageable).map(this::toResponse);
     }
 
-    @Cacheable(value = "pets", key = "#id")
-    public PetResponse findById(Long id) {
+    public PetResponse findById(Long id, AppUser user) {
         Pet pet = repository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pet não encontrado"));
+
+        validateAccess(pet, user);
         return toResponse(pet);
     }
 
@@ -60,9 +61,11 @@ public class PetService {
     }
 
     @CacheEvict(value = "pets", allEntries = true)
-    public PetResponse update(Long id, PetRequest request) {
+    public PetResponse update(Long id, PetRequest request, AppUser user) {
         Pet pet = repository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pet não encontrado"));
+
+        validateAccess(pet, user);
 
         pet.setName(request.name());
         pet.setBreedId(request.breedId());
@@ -77,10 +80,21 @@ public class PetService {
     }
 
     @CacheEvict(value = "pets", allEntries = true)
-    public void delete(Long id) {
+    public void delete(Long id, AppUser user) {
         Pet pet = repository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pet não encontrado"));
+
+        validateAccess(pet, user);
         repository.delete(pet);
+    }
+
+    private void validateAccess(Pet pet, AppUser user) {
+        boolean isAdminOrVet = user.getRoles().stream()
+                .anyMatch(r -> r.getName().equals("ADMIN") || r.getName().equals("VETERINARIAN"));
+
+        if (!isAdminOrVet && (pet.getOwner() == null || !pet.getOwner().getId().equals(user.getId()))) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Você não tem permissão para acessar ou modificar este pet");
+        }
     }
 
     private PetResponse toResponse(Pet pet) {

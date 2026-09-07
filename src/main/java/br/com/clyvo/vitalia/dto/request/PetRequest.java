@@ -21,8 +21,5 @@ public record PetRequest(
 
         CurrentStatus status,
 
-        @NotNull(message = "O ID do tutor é obrigatório")
-        Long ownerUserId,
-
         Long breedId
 ) {}
