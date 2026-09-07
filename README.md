@@ -1,4 +1,4 @@
-# 🐾 Vitalia API
+[# 🐾 Vitalia API
 
 O Vitalia é uma plataforma de monitoramento inteligente para animais de estimação, integrando tutores, veterinários e dispositivos IoT para garantir a saúde e o bem-estar animal.
 
@@ -15,17 +15,11 @@ https://vitalia-txa9.onrender.com/swagger-ui/index.html#/
 http://localhost:8080/swagger-ui/index.html
 ```
 ```bash
-http://localhost:8080/api-docs
-```
-```bash
-http://localhost:8080/h2-console
-```
-```bash
 http://localhost:8080
 ```
 ---
 
-# Cronograma 
+# 📅 Cronograma
 
 | Atividade | Responsável | Data | Status |
 |--------|----------|------------|------------|
@@ -50,6 +44,19 @@ http://localhost:8080
 | Organização de imagens e estrutura do projeto | Manuelalacerda | 21/05 |Concluído |
 | Atualizações da documentação README | Manuelalacerda | 21/05 |Concluído |
 | Adição da pasta de testes e exportação Postman | Manuelalacerda | 21/05 |Concluído |
+| Refatoração e otimização das buscas e serviços (Pet, ClinicalHistory, Appointment) | Manuelalacerda | 31/08 | Concluído |
+| Atualização do script V1 para o Oracle e migração de Account para AppUser | Manuelalacerda | 31/08 | Concluído |
+| Configuração de segurança com Spring Security, JWT, CORS e tratamentos de exceção | Manuelalacerda | 31/08 | Concluído |
+| Implementação do canal WebSocket para alertas e fluxo veterinário | Manuelalacerda | 31/08 | Concluído |
+| Finalização da validação de contratos, roles e expiração do JWT | Manuelalacerda | 01/09 | Concluído |
+| Atualização do TokenService para incluir claims obrigatórias (userId, iat) | Manuelalacerda | 01/09 | Concluído |
+| Atualização das URLs da API pública | Manuelalacerda | 04/09 | Concluído |
+| Adição de script de migration do Flyway e validação de schema com Oracle | Infnet / Manuelalacerda | 06/09 | Concluído |
+| Restrição de cadastros administrativos e atribuição de role padrão | Manuelalacerda | 06/09 | Concluído |
+| Alinhamento do esquema inicial do Flyway com validações do Hibernate | Manuelalacerda | 07/09 | Concluído |
+| Adição de validação de role VETERINARIAN em Appointment e ClinicalHistory | Manuelalacerda | 07/09 | Concluído |
+| Refatoração de repositórios (remoção de RoleRepository excedente) | Manuelalacerda | 07/09 | Concluído |
+| Finalização da suíte de testes unitários e validações da sprint | Manuelalacerda | 07/09 | Concluído |
 
 ---
 
@@ -89,112 +96,84 @@ http://localhost:8080
 
 ---
 
+# ⚙️ Como Configurar e Executar com Oracle / Flyway
 
-# 🔑 1. Accounts 
+### 1. Pré-requisitos
+* Java JDK 21 instalada.
+* Acesso a uma instância do **Oracle Database**.
 
-Módulo base para autenticação e controle de perfis (`TUTOR`, `VETERINARIAN`, `ADMIN`).
+### 2. Configuração de Variáveis de Ambiente
+Configure as seguintes variáveis no seu ambiente ou no arquivo de propriedades:
+* `ORACLE_URL`: `jdbc:oracle:thin:@//host:port/service`
+* `ORACLE_USER`: Seu usuário do banco
+* `ORACLE_PASSWORD`: Sua senha do banco
+* `JWT_SECRET`: Chave secreta para os tokens
+
+### 3. Executando as Migrações
+O projeto utiliza o **Flyway** para gerenciar e versionar o banco de dados Oracle de forma automatizada ao iniciar a aplicação.
+
+---
+
+# 🔐 1. Auth Controller (`/auth`)
 
 | Método | Endpoint | Descrição |
 |--------|----------|------------|
-| POST | `/accounts` | Cria uma nova conta de acesso |
-| GET | `/accounts` | Lista todas as contas (Paginado) |
-| GET | `/accounts/{id}` | Busca detalhes de uma conta específica |
-| PUT | `/accounts/{id}` | Atualiza e-mail, senha ou status |
-| DELETE | `/accounts/{id}` | Remove uma conta do sistema |
+| POST | `/auth/login` | Realiza o login na aplicação |
+| GET | `/auth/me` | Retorna os dados do usuário autenticado atualmente |
+| POST | `/auth/register` | Cadastro geral de usuário |
+| POST | `/auth/register/admin` | Cadastro de usuário com perfil administrador |
+| POST | `/auth/register/tutor` | Cadastro de usuário com perfil tutor |
+| POST | `/auth/register/vet` | Cadastro de usuário com perfil veterinário |
 
-## Exemplo de Cadastro (POST)
+---
 
-### JSON
-
-```json
+POST
+```bash
 {
-  "email": "contato@petguardian.com",
-  "password": "SenhaSegura123",
-  "role": "VETERINARIAN",
+  "email": "manuela.soares@vitalia.com",
+  "password": "SenhaSegura123!",
+  "role": "TUTOR"
+}
+```
+---
+
+# 👤 2. App User Controller (`/users`)
+
+| Método | Endpoint | Descrição |
+|--------|----------|------------|
+| GET | `/users` | Lista todos os usuários |
+| POST | `/users` | Cria um novo usuário |
+| GET | `/users/{id}` | Busca um usuário pelo ID |
+| PUT | `/users/{id}` | Atualiza os dados de um usuário |
+| DELETE | `/users/{id}` | Remove um usuário do sistema |
+
+---
+POST
+```bash
+{
+  "email": "usuario.teste@petguardian.com",
+  "password": "SenhaForte123!",
+  "role": "TUTOR",
   "active": true
 }
 ```
-
 ---
 
-# 👨‍⚕️ 2. Veterinarians
-
-Gerenciamento de profissionais e registros CRMV.
+# 🐶 3. Pets (`/pets`)
 
 | Método | Endpoint | Descrição |
 |--------|----------|------------|
-| POST | `/veterinarians` | Cadastra um veterinário vinculado a uma Account |
-| GET | `/veterinarians` | Lista profissionais e especialidades |
-| GET | `/veterinarians/{id}` | Busca detalhes de um veterinário específico |
-| PUT | `/veterinarians/{id}` | Atualiza dados profissionais ou especialidade |
-| DELETE | `/veterinarians/{id}` | Remove o registro do veterinário |
-
-## Exemplo de Cadastro (POST)
-
-### JSON
-
-```json
-{
-  "fullName": "Dr. Ricardo Santos",
-  "cpf": "123.456.789-00",
-  "crmv": "CRMV-SP 12345",
-  "speciality": "Cardiologia",
-  "accountId": 1
-}
-```
-
----
-
-# 🏠 3. Responsibles 
-
-Informações de contato e localização dos donos dos pets.
-
-| Método | Endpoint | Descrição |
-|--------|----------|------------|
-| POST | `/responsibles` | Cadastra um novo tutor responsável |
-| GET | `/responsibles` | Lista todos os responsáveis cadastrados |
-| GET | `/responsibles/{id}` | Busca um responsável pelo ID |
-| GET | `/responsibles/search` | Busca responsáveis por nome |
-| PUT | `/responsibles/{id}` | Atualiza endereço ou telefone de contato |
-| DELETE | `/responsibles/{id}` | Remove o registro do responsável |
-
-## Exemplo de Cadastro (POST)
-
-### JSON
-
-```json
-{
-  "fullName": "Manuela de Lacerda Soares",
-  "cpf": "987.654.321-11",
-  "dateOfBirth": "1995-05-15",
-  "phoneNumber": "(11) 98765-4321",
-  "address": "Rua das Flores, 123 - São Paulo",
-  "accountId": 2
-}
-```
-
----
-
-# 🐶 4. Pets
-
-O coração do sistema, vinculando o animal ao seu tutor e médico responsável.
-
-| Método | Endpoint | Descrição |
-|--------|----------|------------|
-| POST | `/pets` | Cadastra um pet e define seu status inicial |
-| GET | `/pets` | Lista todos os pets e seus estados de saúde |
-| GET | `/pets/{id}` | Detalhes biométricos de um pet específico |
-| GET | `/pets/search/name` | Busca pets por nome |
-| GET | `/pets/search/species` | Busca pets por espécie |
-| GET | `/pets/search/status` | Busca pets por status |
-| PUT | `/pets/{id}` | Atualiza peso, status ou dados do anim
+| GET | `/pets` | Lista todos os pets (com paginação e ordenação) |
+| POST | `/pets` | Cadastra um novo pet vinculado ao tutor autenticado |
+| GET | `/pets/{id}` | Busca um pet pelo ID |
+| PUT | `/pets/{id}` | Atualiza os dados de um pet |
 | DELETE | `/pets/{id}` | Remove um pet do sistema |
+| GET | `/pets/my-pets` | Lista todos os pets do tutor autenticado |
+| GET | `/pets/search/name` | Busca pets por nome (parcial, sem distinção de maiúsculas) |
 
-## Exemplo de Cadastro (POST)
-
-### JSON
-
-```json
+---
+POST
+```bash
 {
   "name": "Thor",
   "species": "Cão",
@@ -207,20 +186,22 @@ O coração do sistema, vinculando o animal ao seu tutor e médico responsável.
   "veterinarianId": 1
 }
 ```
+---
 
-# 📊 5. Clinical History 
-Este módulo é o núcleo de monitoramento do ecossistema, onde são registrados os dados biométricos (temperatura, batimentos, nível de atividade)
+# 📊 4. Clinical History Controller (`/clinical-histories`)
 
 | Método | Endpoint | Descrição |
 |--------|----------|------------|
-| POST | `/clinical-histories` | Registra novas métricas de saúde para um pet |
-| GET | `/clinical-histories` | Lista todos os registros clínicos (Paginado) |
-| GET | `/clinical-histories/{id}` | Busca um registro específico por ID |
-| GET | `/clinical-histories/pet/{petId}` | Lista o histórico completo de um animal específico |
-| PUT | `/clinical-histories/{id}` | Atualiza ou corrige dados de um registro existente |
-| DELETE | `/clinical-histories/{id}` | Remove um registro do histórico clínico |
+| GET | `/clinical-histories` | Lista todos os históricos clínicos |
+| POST | `/clinical-histories` | Cadastra um novo registro clínico |
+| GET | `/clinical-histories/{id}` | Busca um registro clínico pelo ID |
+| PUT | `/clinical-histories/{id}` | Atualiza um registro clínico |
+| DELETE | `/clinical-histories/{id}` | Remove um registro clínico |
+| GET | `/clinical-histories/pet/{petId}` | Lista o histórico clínico de um pet específico |
 
-```json
+---
+POST
+```bash
 {
   "temperature": 38.5,
   "heartRate": 85,
@@ -231,20 +212,45 @@ Este módulo é o núcleo de monitoramento do ecossistema, onde são registrados
   "petId": 1
 }
 ```
-
-# 🚨 6. Alerts (Alertas Preventivos)
-Este módulo gerencia as notificações geradas pelo sistema com base no monitoramento dos pets.
+---
+# 📅 5. Appointment Controller (`/appointments`)
 
 | Método | Endpoint | Descrição |
 |--------|----------|------------|
-| POST | `/alerts` | Registra um novo alerta preventivo  |
-| GET | `/alerts` | Lista todos os alertas registrados  |
-| GET | `/alerts/{id}` | Busca os detalhes de um alerta específico |
-| GET | `/alerts/pet/{petId}` | Lista o histórico de alertas de um animal específico |
-| PUT | `/alerts/{id}` | Atualiza o alerta e o status |
-| DELETE | `/alerts/{id}` | Remove um alerta do sistema |
+| GET | `/appointments` | Lista todos os agendamentos |
+| POST | `/appointments` | Cria um novo agendamento |
+| GET | `/appointments/{id}` | Busca um agendamento pelo ID |
+| PUT | `/appointments/{id}` | Atualiza um agendamento |
+| DELETE | `/appointments/{id}` | Remove um agendamento |
+| GET | `/appointments/pet/{petId}` | Lista todas as consultas de um pet específico |
 
-```json
+---
+POST
+```bash
+{
+  "appointmentDate": "2026-06-20T14:30:00",
+  "reason": "Consulta de rotina e check-up semestral",
+  "petId": 1,
+  "veterinarianId": 1
+}
+```
+
+---
+
+# 🚨 6. Alert Controller (`/alerts`)
+
+| Método | Endpoint | Descrição |
+|--------|----------|------------|
+| GET | `/alerts` | Lista todos os alertas |
+| POST | `/alerts` | Cria um novo alerta |
+| GET | `/alerts/{id}` | Busca um alerta pelo ID |
+| PUT | `/alerts/{id}` | Atualiza um alerta |
+| DELETE | `/alerts/{id}` | Remove um alerta |
+| GET | `/alerts/pet/{petId}` | Lista os alertas de um pet específico |
+
+---
+POST
+```bash
 {
   "type": "TEMPERATURE",
   "message": "Febre detectada: 40.2°C. O animal já foi medicado.",
@@ -254,30 +260,12 @@ Este módulo gerencia as notificações geradas pelo sistema com base no monitor
 }
 ```
 
-# 📅 7. Appointments 
-Este módulo gerencia o agendamento, diagnóstico e acompanhamento clínico realizado pelos veterinários.
+---
 
-| Método | Endpoint | Descrição |
-|--------|----------|------------|
-| POST | `/appointments` | Agenda uma nova consulta veterinária|
-| GET | `/appointments` | Lista todas as consultas agendadas |
-| GET | `/appointments/{id}` | Busca detalhes de uma consulta específica |
-| PUT | `/appointments/{id}` | Atualiza dados ou status  |
-| DELETE | `/appointments/{id}` | Cancela ou remove uma consulta do cronograma |
+### 🗄 Modelo
 
-```json
-{
-  "appointmentDate": "2026-06-20T14:30:00",
-  "reason": "Consulta de rotina e check-up semestral",
-  "petId": 1,
-  "veterinarianId": 1
-}
-```
-### 🗄 Modelo 
 <div align="center">
   <img src="doc/Pet%20Care%20Management%20Model-2026-05-18-150201.png" alt="Modelo de Gestão de Cuidados de Pets" width="200" />
   <img src="doc/Pet%20Care%20Management%20Model-2026-05-18-150244.png" alt="Modelo de Gestão de Cuidados de Pets" width="305" />
   <img src="doc/Pet%20Care%20Management%20Model-2026-05-18-150318.png" alt="Modelo de Gestão de Cuidados de Pets" width="215" />
 </div>
-
-
