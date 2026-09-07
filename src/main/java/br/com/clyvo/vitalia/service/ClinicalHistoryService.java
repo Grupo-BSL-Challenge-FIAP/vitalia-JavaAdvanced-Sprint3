@@ -9,7 +9,7 @@ import br.com.clyvo.vitalia.entity.Pet;
 import br.com.clyvo.vitalia.repository.AppointmentRepository;
 import br.com.clyvo.vitalia.repository.ClinicalHistoryRepository;
 import br.com.clyvo.vitalia.repository.PetRepository;
-import br.com.clyvo.vitalia.repository.AppUserRepository; // Verifique o nome correto do seu repositório de usuário se necessário
+import br.com.clyvo.vitalia.repository.AppUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -35,6 +35,13 @@ public class ClinicalHistoryService {
 
         AppUser veterinarian = userRepository.findById(request.veterinarianId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Veterinário não encontrado"));
+
+        boolean isVeterinarian = veterinarian.getRoles().stream()
+                .anyMatch(role -> role.getName().equalsIgnoreCase("VETERINARIAN") || role.getName().equalsIgnoreCase("ROLE_VETERINARIAN"));
+
+        if (!isVeterinarian) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "O usuário informado não possui o perfil de Veterinário");
+        }
 
         Appointment appointment = null;
         if (request.appointmentId() != null) {
@@ -84,6 +91,13 @@ public class ClinicalHistoryService {
 
         AppUser veterinarian = userRepository.findById(request.veterinarianId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Veterinário não encontrado"));
+
+        boolean isVeterinarian = veterinarian.getRoles().stream()
+                .anyMatch(role -> role.getName().equalsIgnoreCase("VETERINARIAN") || role.getName().equalsIgnoreCase("ROLE_VETERINARIAN"));
+
+        if (!isVeterinarian) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "O usuário informado não possui o perfil de Veterinário");
+        }
 
         Appointment appointment = null;
         if (request.appointmentId() != null) {

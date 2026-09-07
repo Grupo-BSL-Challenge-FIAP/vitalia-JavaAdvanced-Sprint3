@@ -34,6 +34,13 @@ public class AppointmentService {
         AppUser veterinarian = userRepository.findById(request.veterinarianId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Veterinário não encontrado"));
 
+        boolean isVeterinarian = veterinarian.getRoles().stream()
+                .anyMatch(role -> role.getName().equalsIgnoreCase("VETERINARIAN") || role.getName().equalsIgnoreCase("ROLE_VETERINARIAN"));
+
+        if (!isVeterinarian) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "O usuário informado não possui o perfil de Veterinário");
+        }
+
         Appointment appointment = Appointment.builder()
                 .pet(pet)
                 .veterinarian(veterinarian)
@@ -58,6 +65,13 @@ public class AppointmentService {
 
         AppUser veterinarian = userRepository.findById(request.veterinarianId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Veterinário não encontrado"));
+
+        boolean isVeterinarian = veterinarian.getRoles().stream()
+                .anyMatch(role -> role.getName().equalsIgnoreCase("VETERINARIAN") || role.getName().equalsIgnoreCase("ROLE_VETERINARIAN"));
+
+        if (!isVeterinarian) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "O usuário informado não possui o perfil de Veterinário");
+        }
 
         appointment.setPet(pet);
         appointment.setVeterinarian(veterinarian);
