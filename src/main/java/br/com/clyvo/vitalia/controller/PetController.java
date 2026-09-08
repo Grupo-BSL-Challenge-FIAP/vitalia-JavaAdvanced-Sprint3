@@ -9,7 +9,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -33,7 +35,12 @@ public class PetController {
 
     @GetMapping
     @Operation(summary = "Lista todos os pets com paginação e ordenação")
-    public ResponseEntity<Page<PetResponse>> findAll(Pageable pageable) {
+    public ResponseEntity<Page<PetResponse>> findAll(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sort) {
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sort));
         return ResponseEntity.ok(service.findAll(pageable));
     }
 
@@ -68,7 +75,11 @@ public class PetController {
     @Operation(summary = "Lista todos os pets do tutor autenticado")
     public ResponseEntity<Page<PetResponse>> findMyPets(
             @AuthenticationPrincipal AppUser account,
-            Pageable pageable) {
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sort) {
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sort));
         return ResponseEntity.ok(service.findMyPets(account.getId(), pageable));
     }
 }
