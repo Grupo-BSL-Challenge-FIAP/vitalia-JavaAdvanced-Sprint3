@@ -1,4 +1,4 @@
-[# 🐾 Vitalia API
+# 🐾 Vitalia API
 
 O Vitalia é uma plataforma de monitoramento inteligente para animais de estimação, integrando tutores, veterinários e dispositivos IoT para garantir a saúde e o bem-estar animal.
 
@@ -16,6 +16,46 @@ http://localhost:8080/swagger-ui/index.html
 ```
 ```bash
 http://localhost:8080
+```
+---
+
+# ⚙️ Como Configurar e Executar com Oracle / Flyway
+
+### 1. Pré-requisitos
+* Java JDK 17 instalada.
+* Acesso a uma instância do **Oracle Database**.
+
+### 2. Configuração de Variáveis de Ambiente
+Configure as seguintes variáveis no seu ambiente ou no arquivo de propriedades:
+* `ORACLE_URL`: `jdbc:oracle:thin:@//host:port/service`
+* `ORACLE_USER`: Seu usuário do banco
+* `ORACLE_PASSWORD`: Sua senha do banco
+* `JWT_SECRET`: Chave secreta para os tokens
+
+*(Nota: O projeto não possui um carregador específico de arquivo `.env`; o Spring lê as variáveis de ambiente diretamente).*
+
+### 3. Executando as Migrações
+O projeto utiliza o **Flyway** para gerenciar e versionar o banco de dados Oracle de forma automatizada ao iniciar a aplicação.
+
+---
+  
+# 🏗️ Divisão da Arquitetura 
+    React Native
+    ├── Java -> autenticação + operacional
+    └── .NET -> comercial
+  * JWT Cross-Platform: O token JWT gerado pelo backend Java é totalmente compatível e validado pelo .NET.
+---
+
+# 🔐 Roles do Sistema 
+    * TUTOR
+    * VETERINARIAN
+    * ADMIN
+---
+
+# ⚙️ Como Executar e Testar
+    * Para rodar a suíte de testes automatizados da aplicação Java, utilize o comando:
+```bash
+./mvnw test
 ```
 ---
 
@@ -176,14 +216,11 @@ POST
 ```bash
 {
   "name": "Thor",
-  "species": "Cão",
-  "breed": "Golden Retriever",
-  "gender": "Macho",
+  "sex": "Macho",
   "birthDate": "2021-03-10",
-  "weight": 32.5,
-  "currentStatus": "NORMAL",
-  "responsibleId": 1,
-  "veterinarianId": 1
+  "weightKg": 32.5,
+  "status": "NORMAL",
+  "breedId": 1
 }
 ```
 ---
@@ -203,13 +240,12 @@ POST
 POST
 ```bash
 {
-  "temperature": 38.5,
-  "heartRate": 85,
-  "activityLevel": "HIGH",
-  "healthScore": 95.0,
-  "description": "Monitoramento via ESP32",
+  "petId": 1,
+  "veterinarianId": 1,
+  "appointmentId": 1,
+  "diagnosis": "Check-up semestral",
   "observations": "Dados coletados após exercício matinal",
-  "petId": 1
+  "treatment": "Vitaminas e acompanhamento"
 }
 ```
 ---
@@ -229,7 +265,8 @@ POST
 ```bash
 {
   "appointmentDate": "2026-06-20T14:30:00",
-  "reason": "Consulta de rotina e check-up semestral",
+  "status": "SCHEDULED",
+  "notes": "Consulta de rotina e check-up semestral",
   "petId": 1,
   "veterinarianId": 1
 }
@@ -252,14 +289,13 @@ POST
 POST
 ```bash
 {
-  "type": "TEMPERATURE",
+  "alertType": "TEMPERATURE",
   "message": "Febre detectada: 40.2°C. O animal já foi medicado.",
-  "riskLevel": "HIGH",
+  "severity": "HIGH",
   "status": "RESOLVED",
   "petId": 1
 }
 ```
-
 ---
 
 ### 🗄 Modelo
