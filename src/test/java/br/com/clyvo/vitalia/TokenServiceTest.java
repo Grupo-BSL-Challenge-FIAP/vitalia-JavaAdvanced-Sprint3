@@ -5,12 +5,14 @@ import br.com.clyvo.vitalia.entity.Role;
 import br.com.clyvo.vitalia.service.TokenService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@ActiveProfiles("test")
 class TokenServiceTest {
 
     private TokenService tokenService;
