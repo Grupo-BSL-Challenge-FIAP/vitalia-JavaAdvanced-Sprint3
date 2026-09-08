@@ -30,6 +30,7 @@ public class SecurityConfig {
                         // Rotas públicas de autenticação e documentação
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/auth/register/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/register/tutor").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/register/vet").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/auth/register/admin").hasRole("ADMIN")

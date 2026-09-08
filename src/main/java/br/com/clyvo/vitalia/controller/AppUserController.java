@@ -17,13 +17,7 @@ import org.springframework.web.bind.annotation.*;
 public class AppUserController {
 
     private final AppUserService service;
-
-    @PostMapping
-    public ResponseEntity<AppUserResponse> create(@RequestBody @Valid AppUserRequest request) {
-        AppUserResponse response = service.create(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
-    }
-
+    
     @GetMapping
     public ResponseEntity<Page<AppUserResponse>> findAll(Pageable pageable) {
         Page<AppUserResponse> response = service.findAll(pageable);
