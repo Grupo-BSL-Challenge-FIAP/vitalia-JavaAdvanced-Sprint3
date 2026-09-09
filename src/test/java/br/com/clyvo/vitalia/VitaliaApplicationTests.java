@@ -10,7 +10,7 @@ import org.springframework.test.context.DynamicPropertySource;
 @AutoConfigureMockMvc
 @SpringBootTest
 @ActiveProfiles("test")
-class PetguardianApplicationTests {
+class VitaliaApplicationTests {
 
 	@DynamicPropertySource
 	static void overrideProperties(DynamicPropertyRegistry registry) {
