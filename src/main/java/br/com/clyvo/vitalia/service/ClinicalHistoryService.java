@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -32,6 +33,8 @@ public class ClinicalHistoryService {
     public ClinicalHistoryResponse create(ClinicalHistoryRequest request) {
         Pet pet = petRepository.findById(request.petId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pet não encontrado"));
+
+        validatePetOwnership(pet);
 
         AppUser veterinarian = userRepository.findById(request.veterinarianId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Veterinário não encontrado"));
@@ -68,13 +71,19 @@ public class ClinicalHistoryService {
     public ClinicalHistoryResponse findById(Long id) {
         ClinicalHistory history = repository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Registro clínico não encontrado"));
+
+        if (history.getPet() != null) {
+            validatePetOwnership(history.getPet());
+        }
+
         return toResponse(history);
     }
 
     public List<ClinicalHistoryResponse> findByPetId(Long petId) {
-        if (!petRepository.existsById(petId)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Pet não encontrado");
-        }
+        Pet pet = petRepository.findById(petId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pet não encontrado"));
+
+        validatePetOwnership(pet);
 
         return repository.findByPetIdOrderByRecordDateDesc(petId)
                 .stream()
@@ -88,6 +97,8 @@ public class ClinicalHistoryService {
 
         Pet pet = petRepository.findById(request.petId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pet não encontrado"));
+
+        validatePetOwnership(pet);
 
         AppUser veterinarian = userRepository.findById(request.veterinarianId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Veterinário não encontrado"));
@@ -116,10 +127,32 @@ public class ClinicalHistoryService {
     }
 
     public void delete(Long id) {
-        if (!repository.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Registro clínico não encontrado");
+        ClinicalHistory history = repository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Registro clínico não encontrado"));
+        if (history.getPet() != null) {
+            validatePetOwnership(history.getPet());
         }
         repository.deleteById(id);
+    }
+
+    private void validatePetOwnership(Pet pet) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        AppUser currentUser = userRepository.findByEmail(email).orElse(null);
+        if (currentUser != null) {
+            boolean isTutor = currentUser.getRoles().stream()
+                    .anyMatch(r -> r.getName().equalsIgnoreCase("TUTOR") || r.getName().equalsIgnoreCase("ROLE_TUTOR"));
+            boolean isAdminOrVet = currentUser.getRoles().stream()
+                    .anyMatch(r -> r.getName().equalsIgnoreCase("ADMIN") || r.getName().equalsIgnoreCase("ROLE_ADMIN") ||
+                            r.getName().equalsIgnoreCase("VETERINARIAN") || r.getName().equalsIgnoreCase("ROLE_VETERINARIAN"));
+
+            if (isTutor && !isAdminOrVet) {
+                boolean isOwner = pet.getOwner() != null && pet.getOwner().getId().equals(currentUser.getId());
+
+                if (!isOwner) {
+                    throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Acesso negado: este pet não pertence ao seu usuário");
+                }
+            }
+        }
     }
 
     private ClinicalHistoryResponse toResponse(ClinicalHistory history) {
