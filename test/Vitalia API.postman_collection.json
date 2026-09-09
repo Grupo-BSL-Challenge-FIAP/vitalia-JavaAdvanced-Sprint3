@@ -1,0 +1,351 @@
+{
+  "info": {
+    "_postman_id": "vitalia-api-collection-v2",
+    "name": "Vitalia API",
+    "description": "API para monitoramento inteligente e gerenciamento de pets, agendamentos, históricos e alertas do sistema Vitalia.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"manuela.soares@vitalia.com\",\n  \"password\": \"SenhaSegura123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Me (Dados do usuário autenticado)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "me"]
+            }
+          }
+        },
+        {
+          "name": "Registro Geral",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Novo Usuario\",\n  \"email\": \"usuario@vitalia.com\",\n  \"password\": \"Senha@123\",\n  \"phone\": \"(11) 98888-7777\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "Registro Admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Administrador\",\n  \"email\": \"admin@vitalia.com\",\n  \"password\": \"Admin@123\",\n  \"phone\": \"(11) 99999-9999\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register/admin",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register", "admin"]
+            }
+          }
+        },
+        {
+          "name": "Registro Tutor",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Tutor Exemplo\",\n  \"email\": \"tutor@vitalia.com\",\n  \"password\": \"Tutor@123\",\n  \"phone\": \"(11) 97777-6666\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register/tutor",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register", "tutor"]
+            }
+          }
+        },
+        {
+          "name": "Registro Veterinário",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Dr. Ricardo Santos\",\n  \"email\": \"vet@vitalia.com\",\n  \"password\": \"Vet@123\",\n  \"phone\": \"(11) 96666-5555\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register/vet",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register", "vet"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Listar Todos",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["users"]
+            }
+          }
+        },
+        {
+          "name": "Buscar por ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Pets",
+      "item": [
+        {
+          "name": "Listar Pets (Paginado)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/pets?page=0&size=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["pets"],
+              "query": [
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "10" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Cadastrar Pet",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Thor\",\n  \"sex\": \"Macho\",\n  \"birthDate\": \"2021-03-10\",\n  \"weightKg\": 32.5,\n  \"status\": \"NORMAL\",\n  \"breedId\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/pets",
+              "host": ["{{baseUrl}}"],
+              "path": ["pets"]
+            }
+          }
+        },
+        {
+          "name": "Listar Meus Pets",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/pets/my-pets",
+              "host": ["{{baseUrl}}"],
+              "path": ["pets", "my-pets"]
+            }
+          }
+        },
+        {
+          "name": "Buscar Pet por Nome",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/pets/search/name?name=Thor",
+              "host": ["{{baseUrl}}"],
+              "path": ["pets", "search", "name"],
+              "query": [
+                { "key": "name", "value": "Thor" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Appointments",
+      "item": [
+        {
+          "name": "Listar Agendamentos",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/appointments",
+              "host": ["{{baseUrl}}"],
+              "path": ["appointments"]
+            }
+          }
+        },
+        {
+          "name": "Criar Agendamento",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"appointmentDate\": \"2026-06-20T14:30:00\",\n  \"status\": \"SCHEDULED\",\n  \"notes\": \"Consulta de rotina e check-up semestral\",\n  \"petId\": 1,\n  \"veterinarianId\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/appointments",
+              "host": ["{{baseUrl}}"],
+              "path": ["appointments"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Clinical Histories",
+      "item": [
+        {
+          "name": "Listar Históricos Clínicos",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/clinical-histories",
+              "host": ["{{baseUrl}}"],
+              "path": ["clinical-histories"]
+            }
+          }
+        },
+        {
+          "name": "Cadastrar Histórico Clínico",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"petId\": 1,\n  \"veterinarianId\": 1,\n  \"appointmentId\": 1,\n  \"diagnosis\": \"Check-up semestral\",\n  \"observations\": \"Dados coletados após exercício matinal\",\n  \"treatment\": \"Vitaminas e acompanhamento\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/clinical-histories",
+              "host": ["{{baseUrl}}"],
+              "path": ["clinical-histories"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Alerts",
+      "item": [
+        {
+          "name": "Listar Alertas",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/alerts",
+              "host": ["{{baseUrl}}"],
+              "path": ["alerts"]
+            }
+          }
+        },
+        {
+          "name": "Criar Alerta",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"alertType\": \"TEMPERATURE\",\n  \"message\": \"Febre detectada: 40.2°C. O animal já foi medicado.\",\n  \"severity\": \"HIGH\",\n  \"status\": \"RESOLVED\",\n  \"petId\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/alerts",
+              "host": ["{{baseUrl}}"],
+              "path": ["alerts"]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "jwtToken",
+      "value": "SEU_TOKEN_AQUI"
+    }
+  ]
+}
