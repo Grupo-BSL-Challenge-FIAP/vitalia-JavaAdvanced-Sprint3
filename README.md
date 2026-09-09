@@ -182,21 +182,10 @@ POST
 | Método | Endpoint | Descrição |
 |--------|----------|------------|
 | GET | `/users` | Lista todos os usuários |
-| POST | `/users` | Cria um novo usuário |
 | GET | `/users/{id}` | Busca um usuário pelo ID |
 | PUT | `/users/{id}` | Atualiza os dados de um usuário |
 | DELETE | `/users/{id}` | Remove um usuário do sistema |
 
----
-POST
-```bash
-{
-  "email": "usuario.teste@petguardian.com",
-  "password": "SenhaForte123!",
-  "role": "TUTOR",
-  "active": true
-}
-```
 ---
 
 # 🐶 3. Pets (`/pets`)
