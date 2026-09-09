@@ -6,11 +6,18 @@ import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 
 public record MobileRegisterRequest(
-        @NotBlank @Email String email,
-        @NotBlank String password,
-        @NotBlank String fullName,
-        @NotBlank String cpf,
-        @NotNull LocalDate dateOfBirth,
-        @NotBlank String phoneNumber,
-        @NotBlank String address
+
+        @NotBlank
+        @Email
+        String email,
+
+        @NotBlank
+        String password,
+
+        @NotBlank
+        String fullName,
+
+        @NotBlank
+        String phoneNumber
+
 ) {}
