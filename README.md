@@ -191,7 +191,7 @@ ADMIN
 TUTOR
 ```bash
 {
-  "email": "ester@gmail.com",
+  "email": "manu@gmail.com",
   "password": "senha123"
 }
 ```
