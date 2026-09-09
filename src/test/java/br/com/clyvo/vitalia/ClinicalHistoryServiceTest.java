@@ -44,13 +44,23 @@ class ClinicalHistoryServiceTest {
     void deveLancarExcecaoQuandoUsuarioNaoForVeterinarioAoCriarHistorico() {
         AppUser tutor = new AppUser();
         tutor.setId(1L);
+        tutor.setEmail("tutor@email.com");
 
         Role roleTutor = new Role();
         roleTutor.setName("TUTOR");
         tutor.setRoles(Set.of(roleTutor));
 
-        when(petRepository.findById(1L)).thenReturn(Optional.of(new Pet()));
+        Pet pet = new Pet();
+        pet.setId(1L);
+        pet.setOwner(tutor); // ou pet.setOwnerUserId(1L) dependendo da sua entidade
+
+        when(petRepository.findById(1L)).thenReturn(Optional.of(pet));
         when(userRepository.findById(1L)).thenReturn(Optional.of(tutor));
+        when(userRepository.findByEmail("tutor@email.com")).thenReturn(Optional.of(tutor));
+
+        org.springframework.security.core.Authentication auth = org.mockito.Mockito.mock(org.springframework.security.core.Authentication.class);
+        org.mockito.Mockito.when(auth.getName()).thenReturn("tutor@email.com");
+        org.springframework.security.core.context.SecurityContextHolder.getContext().setAuthentication(auth);
 
         ClinicalHistoryRequest requestDTO = new ClinicalHistoryRequest(
                 1L,

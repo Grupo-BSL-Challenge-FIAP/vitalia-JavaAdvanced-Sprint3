@@ -2,6 +2,7 @@ package br.com.clyvo.vitalia;
 
 import br.com.clyvo.vitalia.dto.request.AppointmentRequest;
 import br.com.clyvo.vitalia.entity.AppUser;
+import br.com.clyvo.vitalia.entity.Pet;
 import br.com.clyvo.vitalia.entity.Role;
 import br.com.clyvo.vitalia.repository.AppointmentRepository;
 import br.com.clyvo.vitalia.repository.AppUserRepository;
@@ -47,14 +48,23 @@ class AppointmentServiceTest {
     void deveLancarExcecaoQuandoUsuarioNaoForVeterinario() {
         AppUser tutor = new AppUser();
         tutor.setId(1L);
+        tutor.setEmail("tutor@email.com");
 
         Role roleTutor = new Role();
         roleTutor.setName("TUTOR");
         tutor.setRoles(Set.of(roleTutor));
 
-        when(petRepository.existsById(1L)).thenReturn(true);
-        when(petRepository.findById(1L)).thenReturn(Optional.of(new br.com.clyvo.vitalia.entity.Pet()));
+        Pet pet = new Pet();
+        pet.setId(1L);
+        pet.setOwner(tutor); // ou pet.setOwnerUserId(1L) dependendo da sua entidade
+
+        when(petRepository.findById(1L)).thenReturn(Optional.of(pet));
         when(userRepository.findById(1L)).thenReturn(Optional.of(tutor));
+        when(userRepository.findByEmail("tutor@email.com")).thenReturn(Optional.of(tutor));
+
+        org.springframework.security.core.Authentication auth = org.mockito.Mockito.mock(org.springframework.security.core.Authentication.class);
+        org.mockito.Mockito.when(auth.getName()).thenReturn("tutor@email.com");
+        org.springframework.security.core.context.SecurityContextHolder.getContext().setAuthentication(auth);
 
         AppointmentRequest requestDTO = new AppointmentRequest(
                 LocalDateTime.now(),
