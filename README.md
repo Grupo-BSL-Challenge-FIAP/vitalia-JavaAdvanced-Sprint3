@@ -61,6 +61,11 @@ O projeto utiliza o **Flyway** para gerenciar e versionar o banco de dados Oracl
 
 # 📅 Cronograma
 
+💡 **Nota sobre o Histórico de Desenvolvimento:** As menções às entidades Account, Responsible, Veterinarian
+e ResponsibleRequest presentes nas primeiras entradas datam da fase inicial do projeto (evolução da arquitetura
+original para o ecossistema atual do Vitalia). Elas foram posteriormente refatoradas, unificadas ou renomeadas
+para estruturas mais robustas como AppUser.
+
 | Atividade | Responsável | Data | Status |
 |--------|----------|------------|------------|
 | Implementação da entidade Account | Manuelalacerda | 13/05 |Concluído |
@@ -109,7 +114,7 @@ O projeto utiliza o **Flyway** para gerenciar e versionar o banco de dados Oracl
     </td>
     <td>
       <b>Moisés Barsoti Andrade de Oliveira</b><br/>
-      <b>RM:</b> 565049 &nbsp;&nbsp;|&nbsp;&nbsp;<b>Turma:</b> 2TDSPG - FIAP <br/>
+      <b>RM:</b> 565049 &nbsp;&nbsp;|&nbsp;&nbsp;<b>Turma:</b> 2TDSPO - FIAP <br/>
     </td>
   </tr>
 
@@ -139,7 +144,6 @@ O projeto utiliza o **Flyway** para gerenciar e versionar o banco de dados Oracl
 # ⚙️ Como Configurar e Executar com Oracle / Flyway
 
 ### 1. Pré-requisitos
-* Java JDK 21 instalada.
 * Acesso a uma instância do **Oracle Database**.
 
 ### 2. Configuração de Variáveis de Ambiente
@@ -260,7 +264,6 @@ POST
   "veterinarianId": 1
 }
 ```
-
 ---
 
 # 🚨 6. Alert Controller (`/alerts`)
