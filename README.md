@@ -180,6 +180,30 @@ POST
 }
 ```
 ---
+ADMIN
+```bash
+{
+  "email": "ester@gmail.com",
+  "password": "senha123"
+}
+```
+---
+TUTOR
+```bash
+{
+  "email": "ester@gmail.com",
+  "password": "senha123"
+}
+```
+---
+VETERINARIAN
+```bash
+{
+  "email": "vet@vitalia.com",
+  "password": "SenhaSegura123"
+}
+```
+---
 
 # 👤 2. App User Controller (`/users`)
 
