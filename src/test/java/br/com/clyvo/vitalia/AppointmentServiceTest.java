@@ -67,7 +67,7 @@ class AppointmentServiceTest {
         when(userRepository.findByEmail("tutor@email.com")).thenReturn(Optional.of(tutor));
 
         org.mockito.Mockito.doNothing().when(authorizationService).validatePetOwnership(org.mockito.ArgumentMatchers.any());
-        org.mockito.Mockito.doCallRealMethod().when(authorizationService).validateVeterinarian(org.mockito.ArgumentMatchers.any()); // <--- Adicionar esta linha
+        org.mockito.Mockito.doCallRealMethod().when(authorizationService).validateVeterinarian(org.mockito.ArgumentMatchers.any());
 
         when(appointmentRepository.save(org.mockito.ArgumentMatchers.any())).thenAnswer(invocation -> invocation.getArgument(0));
 

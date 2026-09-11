@@ -1,13 +1,11 @@
 package br.com.clyvo.vitalia.service;
 
 import br.com.clyvo.vitalia.entity.AppUser;
-import br.com.clyvo.vitalia.enums.AppUserStatus;
 import br.com.clyvo.vitalia.repository.AppUserRepository;
 import br.com.clyvo.vitalia.dto.request.AppUserRequest;
 import br.com.clyvo.vitalia.dto.response.AppUserResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.data.domain.Page;
