@@ -141,23 +141,6 @@ para estruturas mais robustas como AppUser.
 
 ---
 
-# ⚙️ Como Configurar e Executar com Oracle / Flyway
-
-### 1. Pré-requisitos
-* Acesso a uma instância do **Oracle Database**.
-
-### 2. Configuração de Variáveis de Ambiente
-Configure as seguintes variáveis no seu ambiente ou no arquivo de propriedades:
-* `ORACLE_URL`: `jdbc:oracle:thin:@//host:port/service`
-* `ORACLE_USER`: Seu usuário do banco
-* `ORACLE_PASSWORD`: Sua senha do banco
-* `JWT_SECRET`: Chave secreta para os tokens
-
-### 3. Executando as Migrações
-O projeto utiliza o **Flyway** para gerenciar e versionar o banco de dados Oracle de forma automatizada ao iniciar a aplicação.
-
----
-
 # 🔐 1. Auth Controller (`/auth`)
 
 | Método | Endpoint | Descrição |
@@ -174,9 +157,10 @@ O projeto utiliza o **Flyway** para gerenciar e versionar o banco de dados Oracl
 POST
 ```bash
 {
-  "email": "manuela.soares@vitalia.com",
-  "password": "SenhaSegura123!",
-  "role": "TUTOR"
+  "fullName":"Tutor ",
+  "email":"tutor1@vitalia.com",
+  "password":"SenhaSegura123!",
+  "phoneNumber":"(11) 99999-9999"
 }
 ```
 ---
