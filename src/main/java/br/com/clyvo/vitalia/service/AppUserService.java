@@ -20,23 +20,7 @@ import java.time.LocalDateTime;
 public class AppUserService {
 
     private final AppUserRepository repository;
-
-    public AppUserResponse create(AppUserRequest request) {
-        LocalDateTime now = LocalDateTime.now();
-
-        AppUser user = AppUser.builder()
-                .fullName(request.fullName())
-                .email(request.email())
-                .passwordHash(new BCryptPasswordEncoder().encode(request.password()))
-                .phone(request.phone())
-                .status(AppUserStatus.ACTIVE)
-                .createdAt(now)
-                .updatedAt(now)
-                .build();
-
-        return toResponse(repository.save(user));
-    }
-
+    
     public Page<AppUserResponse> findAll(Pageable pageable) {
         return repository.findAll(pageable).map(this::toResponse);
     }
