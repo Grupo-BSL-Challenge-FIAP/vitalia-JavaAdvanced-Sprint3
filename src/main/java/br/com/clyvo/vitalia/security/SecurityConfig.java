@@ -42,7 +42,8 @@ public class SecurityConfig {
                         // Permissões de Pets
                         .requestMatchers(HttpMethod.GET, "/pets/my-pets").hasRole("TUTOR")
                         .requestMatchers(HttpMethod.GET, "/pets/search/name").hasAnyRole("VETERINARIAN", "ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/pets/**").hasAnyRole("VETERINARIAN", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/pets/{id}").hasAnyRole("TUTOR", "VETERINARIAN", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/pets").hasAnyRole("VETERINARIAN", "ADMIN")
                         .requestMatchers(HttpMethod.POST, "/pets/**").hasAnyRole("TUTOR", "ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/pets/**").hasAnyRole("TUTOR", "ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/pets/**").hasAnyRole("TUTOR", "ADMIN")
