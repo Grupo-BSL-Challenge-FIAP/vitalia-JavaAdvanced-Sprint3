@@ -38,6 +38,29 @@ Configure as seguintes variáveis no seu ambiente ou no arquivo de propriedades:
 O projeto utiliza o **Flyway** para gerenciar e versionar o banco de dados Oracle de forma automatizada ao iniciar a aplicação.
 
 ---
+
+# 💻 Como Iniciar a Aplicação
+Mac/Linux
+```bash
+chmod +x mvnw
+./mvnw spring-boot:run
+```
+Windows
+```bash
+.\mvnw.cmd spring-boot:run
+```
+---
+
+🧪 Executando os Testes Automatizados
+Mac/Linux
+```bash
+./mvnw clean test
+```
+Windows
+```bash
+.\mvnw.cmd clean test
+```
+---
   
 # 🏗️ Divisão da Arquitetura 
     React Native
@@ -143,14 +166,14 @@ para estruturas mais robustas como AppUser.
 
 # 🔐 1. Auth Controller (`/auth`)
 
-| Método | Endpoint | Descrição |
-|--------|----------|------------|
-| POST | `/auth/login` | Realiza o login na aplicação |
+| Método | Endpoint | Descrição/Perfil de Acesso                         |
+|--------|----------|----------------------------------------------------|
+| POST | `/auth/login` | Realiza o login na aplicação                       |
 | GET | `/auth/me` | Retorna os dados do usuário autenticado atualmente |
-| POST | `/auth/register` | Cadastro geral de usuário |
-| POST | `/auth/register/admin` | Cadastro de usuário com perfil administrador |
-| POST | `/auth/register/tutor` | Cadastro de usuário com perfil tutor |
-| POST | `/auth/register/vet` | Cadastro de usuário com perfil veterinário |
+| POST | `/auth/register` | Cadastro público TUTOR                             |
+| POST | `/auth/register/admin` | ADMIN                                              |
+| POST | `/auth/register/tutor` | Cadastro de usuário com perfil tutor               |
+| POST | `/auth/register/vet` | ADMIN                                              |
 
 ---
 
@@ -191,25 +214,25 @@ VETERINARIAN
 
 # 👤 2. App User Controller (`/users`)
 
-| Método | Endpoint | Descrição |
-|--------|----------|------------|
-| GET | `/users` | Lista todos os usuários |
-| GET | `/users/{id}` | Busca um usuário pelo ID |
+| Método | Endpoint | Descrição/Perfil de Acesso      |
+|--------|----------|---------------------------------|
+| GET | `/users` | ADMIN                           |
+| GET | `/users/{id}` | Busca um usuário pelo ID        |
 | PUT | `/users/{id}` | Atualiza os dados de um usuário |
-| DELETE | `/users/{id}` | Remove um usuário do sistema |
+| DELETE | `/users/{id}` | Remove um usuário do sistema    |
 
 ---
 
 # 🐶 3. Pets (`/pets`)
 
-| Método | Endpoint | Descrição |
-|--------|----------|------------|
-| GET | `/pets` | Lista todos os pets (com paginação e ordenação) |
-| POST | `/pets` | Cadastra um novo pet vinculado ao tutor autenticado |
-| GET | `/pets/{id}` | Busca um pet pelo ID |
-| PUT | `/pets/{id}` | Atualiza os dados de um pet |
-| DELETE | `/pets/{id}` | Remove um pet do sistema |
-| GET | `/pets/my-pets` | Lista todos os pets do tutor autenticado |
+| Método | Endpoint | Descrição/Perfil de Acesso                                 |
+|--------|----------|------------------------------------------------------------|
+| GET | `/pets` | VETERINARIAN/ADMIN                                         |
+| POST | `/pets` | Cadastra um novo pet vinculado ao tutor autenticado        |
+| GET | `/pets/{id}` | Busca um pet pelo ID                                       |
+| PUT | `/pets/{id}` | Atualiza os dados de um pet                                |
+| DELETE | `/pets/{id}` | Remove um pet do sistema                                   |
+| GET | `/pets/my-pets` | Lista todos os pets do tutor autenticado                   |
 | GET | `/pets/search/name` | Busca pets por nome (parcial, sem distinção de maiúsculas) |
 
 ---
@@ -228,13 +251,13 @@ POST
 
 # 📊 4. Clinical History Controller (`/clinical-histories`)
 
-| Método | Endpoint | Descrição |
-|--------|----------|------------|
-| GET | `/clinical-histories` | Lista todos os históricos clínicos |
-| POST | `/clinical-histories` | Cadastra um novo registro clínico |
-| GET | `/clinical-histories/{id}` | Busca um registro clínico pelo ID |
-| PUT | `/clinical-histories/{id}` | Atualiza um registro clínico |
-| DELETE | `/clinical-histories/{id}` | Remove um registro clínico |
+| Método | Endpoint | Descrição/Perfil de Acesso                     |
+|--------|----------|------------------------------------------------|
+| GET | `/clinical-histories` | VETERINARIAN/ADMIN                             |
+| POST | `/clinical-histories` | Cadastra um novo registro clínico              |
+| GET | `/clinical-histories/{id}` | Busca um registro clínico pelo ID              |
+| PUT | `/clinical-histories/{id}` | Atualiza um registro clínico                   |
+| DELETE | `/clinical-histories/{id}` | Remove um registro clínico                     |
 | GET | `/clinical-histories/pet/{petId}` | Lista o histórico clínico de um pet específico |
 
 ---
@@ -276,13 +299,13 @@ POST
 
 # 🚨 6. Alert Controller (`/alerts`)
 
-| Método | Endpoint | Descrição |
-|--------|----------|------------|
-| GET | `/alerts` | Lista todos os alertas |
-| POST | `/alerts` | Cria um novo alerta |
-| GET | `/alerts/{id}` | Busca um alerta pelo ID |
-| PUT | `/alerts/{id}` | Atualiza um alerta |
-| DELETE | `/alerts/{id}` | Remove um alerta |
+| Método | Endpoint | Descrição/Perfil de acesso            |
+|--------|----------|---------------------------------------|
+| GET | `/alerts` | VETERINARIAN/ADMIN                    |
+| POST | `/alerts` | Cria um novo alerta                   |
+| GET | `/alerts/{id}` | Busca um alerta pelo ID               |
+| PUT | `/alerts/{id}` | Atualiza um alerta                    |
+| DELETE | `/alerts/{id}` | Remove um alerta                      |
 | GET | `/alerts/pet/{petId}` | Lista os alertas de um pet específico |
 
 ---
