@@ -50,7 +50,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"fullName\": \"Novo Usuario\",\n  \"email\": \"usuario@vitalia.com\",\n  \"password\": \"Senha@123\",\n  \"phone\": \"(11) 98888-7777\"\n}"
+              "raw": "{\n  \"fullName\": \"Novo Usuario\",\n  \"email\": \"usuario@vitalia.com\",\n  \"password\": \"Senha@123\",\n  \"phoneNumber\": \"(11) 98888-7777\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/auth/register",
