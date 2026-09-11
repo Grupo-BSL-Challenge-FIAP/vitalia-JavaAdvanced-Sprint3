@@ -3,17 +3,14 @@ package br.com.clyvo.vitalia.service;
 import br.com.clyvo.vitalia.dto.request.AlertRequest;
 import br.com.clyvo.vitalia.dto.response.AlertResponse;
 import br.com.clyvo.vitalia.entity.Alert;
-import br.com.clyvo.vitalia.entity.AppUser;
 import br.com.clyvo.vitalia.entity.Pet;
 import br.com.clyvo.vitalia.repository.AlertRepository;
-import br.com.clyvo.vitalia.repository.AppUserRepository;
 import br.com.clyvo.vitalia.repository.PetRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -27,14 +24,14 @@ public class AlertService {
 
     private final AlertRepository repository;
     private final PetRepository petRepository;
-    private final AppUserRepository userRepository;
+    private final AuthorizationService authorizationService;
     private final SimpMessagingTemplate messagingTemplate;
 
     public AlertResponse create(AlertRequest request) {
         Pet pet = petRepository.findById(request.petId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pet não encontrado"));
 
-        validatePetOwnership(pet);
+        authorizationService.validatePetOwnership(pet);
 
         Alert alert = Alert.builder()
                 .pet(pet)
@@ -52,7 +49,7 @@ public class AlertService {
         return response;
     }
 
-    public Page<AlertResponse> findAll(Pageable pageable) {
+    public Page findAll(Pageable pageable) {
         return repository.findAll(pageable).map(this::toResponse);
     }
 
@@ -61,17 +58,17 @@ public class AlertService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Alerta não encontrado"));
 
         if (alert.getPet() != null) {
-            validatePetOwnership(alert.getPet());
+            authorizationService.validatePetOwnership(alert.getPet());
         }
 
         return toResponse(alert);
     }
 
-    public List<AlertResponse> findByPet(Long petId) {
+    public List findByPet(Long petId) {
         Pet pet = petRepository.findById(petId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pet não encontrado"));
 
-        validatePetOwnership(pet);
+        authorizationService.validatePetOwnership(pet);
 
         return repository.findByPetIdOrderByCreatedAtDesc(petId)
                 .stream()
@@ -86,7 +83,7 @@ public class AlertService {
         Pet pet = petRepository.findById(request.petId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pet não encontrado"));
 
-        validatePetOwnership(pet);
+        authorizationService.validatePetOwnership(pet);
 
         alert.setPet(pet);
         alert.setAlertType(request.alertType().name());
@@ -108,28 +105,9 @@ public class AlertService {
         Alert alert = repository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Alerta não encontrado"));
         if (alert.getPet() != null) {
-            validatePetOwnership(alert.getPet());
+            authorizationService.validatePetOwnership(alert.getPet());
         }
         repository.deleteById(id);
-    }
-
-    private void validatePetOwnership(Pet pet) {
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        AppUser currentUser = userRepository.findByEmail(email).orElse(null);
-        if (currentUser != null) {
-            boolean isTutor = currentUser.getRoles().stream()
-                    .anyMatch(r -> r.getName().equalsIgnoreCase("TUTOR") || r.getName().equalsIgnoreCase("ROLE_TUTOR"));
-            boolean isAdminOrVet = currentUser.getRoles().stream()
-                    .anyMatch(r -> r.getName().equalsIgnoreCase("ADMIN") || r.getName().equalsIgnoreCase("ROLE_ADMIN") ||
-                            r.getName().equalsIgnoreCase("VETERINARIAN") || r.getName().equalsIgnoreCase("ROLE_VETERINARIAN"));
-
-            if (isTutor && !isAdminOrVet) {
-                boolean isOwner = pet.getOwner() != null && pet.getOwner().getId().equals(currentUser.getId());
-                if (!isOwner) {
-                    throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Acesso negado: este pet não pertence ao seu usuário");
-                }
-            }
-        }
     }
 
     private AlertResponse toResponse(Alert alert) {

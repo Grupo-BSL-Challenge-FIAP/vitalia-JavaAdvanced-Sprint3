@@ -5,14 +5,18 @@ import br.com.clyvo.vitalia.entity.AppUser;
 import br.com.clyvo.vitalia.entity.Pet;
 import br.com.clyvo.vitalia.entity.Role;
 import br.com.clyvo.vitalia.repository.AppUserRepository;
+import br.com.clyvo.vitalia.repository.AppointmentRepository;
 import br.com.clyvo.vitalia.repository.ClinicalHistoryRepository;
 import br.com.clyvo.vitalia.repository.PetRepository;
+import br.com.clyvo.vitalia.service.AuthorizationService;
 import br.com.clyvo.vitalia.service.ClinicalHistoryService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.server.ResponseStatusException;
@@ -25,6 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 @ActiveProfiles("test")
 class ClinicalHistoryServiceTest {
 
@@ -36,6 +41,12 @@ class ClinicalHistoryServiceTest {
 
     @Mock
     private AppUserRepository userRepository;
+
+    @Mock
+    private AuthorizationService authorizationService;
+
+    @Mock
+    private AppointmentRepository appointmentRepository;
 
     @InjectMocks
     private ClinicalHistoryService clinicalHistoryService;
@@ -52,11 +63,17 @@ class ClinicalHistoryServiceTest {
 
         Pet pet = new Pet();
         pet.setId(1L);
-        pet.setOwner(tutor); // ou pet.setOwnerUserId(1L) dependendo da sua entidade
+        pet.setOwner(tutor);
 
         when(petRepository.findById(1L)).thenReturn(Optional.of(pet));
         when(userRepository.findById(1L)).thenReturn(Optional.of(tutor));
         when(userRepository.findByEmail("tutor@email.com")).thenReturn(Optional.of(tutor));
+
+        org.mockito.Mockito.doNothing().when(authorizationService).validatePetOwnership(org.mockito.ArgumentMatchers.any());
+        org.mockito.Mockito.doCallRealMethod().when(authorizationService).validateVeterinarian(org.mockito.ArgumentMatchers.any());
+
+        when(clinicalHistoryRepository.save(org.mockito.ArgumentMatchers.any())).thenAnswer(invocation -> invocation.getArgument(0));
+        when(appointmentRepository.findById(org.mockito.ArgumentMatchers.any())).thenReturn(Optional.empty());
 
         org.springframework.security.core.Authentication auth = org.mockito.Mockito.mock(org.springframework.security.core.Authentication.class);
         org.mockito.Mockito.when(auth.getName()).thenReturn("tutor@email.com");

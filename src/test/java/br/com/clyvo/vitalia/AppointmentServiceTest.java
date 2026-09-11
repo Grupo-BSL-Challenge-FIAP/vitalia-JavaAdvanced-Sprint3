@@ -8,6 +8,7 @@ import br.com.clyvo.vitalia.repository.AppointmentRepository;
 import br.com.clyvo.vitalia.repository.AppUserRepository;
 import br.com.clyvo.vitalia.repository.PetRepository;
 import br.com.clyvo.vitalia.service.AppointmentService;
+import br.com.clyvo.vitalia.service.AuthorizationService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -41,6 +42,9 @@ class AppointmentServiceTest {
     @Mock
     private AppUserRepository userRepository;
 
+    @Mock
+    private AuthorizationService authorizationService;
+
     @InjectMocks
     private AppointmentService appointmentService;
 
@@ -56,11 +60,16 @@ class AppointmentServiceTest {
 
         Pet pet = new Pet();
         pet.setId(1L);
-        pet.setOwner(tutor); // ou pet.setOwnerUserId(1L) dependendo da sua entidade
+        pet.setOwner(tutor);
 
         when(petRepository.findById(1L)).thenReturn(Optional.of(pet));
         when(userRepository.findById(1L)).thenReturn(Optional.of(tutor));
         when(userRepository.findByEmail("tutor@email.com")).thenReturn(Optional.of(tutor));
+
+        org.mockito.Mockito.doNothing().when(authorizationService).validatePetOwnership(org.mockito.ArgumentMatchers.any());
+        org.mockito.Mockito.doCallRealMethod().when(authorizationService).validateVeterinarian(org.mockito.ArgumentMatchers.any()); // <--- Adicionar esta linha
+
+        when(appointmentRepository.save(org.mockito.ArgumentMatchers.any())).thenAnswer(invocation -> invocation.getArgument(0));
 
         org.springframework.security.core.Authentication auth = org.mockito.Mockito.mock(org.springframework.security.core.Authentication.class);
         org.mockito.Mockito.when(auth.getName()).thenReturn("tutor@email.com");
