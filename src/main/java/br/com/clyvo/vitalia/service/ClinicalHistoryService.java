@@ -45,6 +45,14 @@ public class ClinicalHistoryService {
         if (request.appointmentId() != null) {
             appointment = appointmentRepository.findById(request.appointmentId())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Consulta não encontrada"));
+
+            if (appointment.getPet() == null || !appointment.getPet().getId().equals(pet.getId())) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "A consulta informada não pertence ao pet especificado");
+            }
+
+            if (appointment.getVeterinarian() == null || !appointment.getVeterinarian().getId().equals(veterinarian.getId())) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O veterinário da consulta não corresponde ao veterinário informado");
+            }
         }
 
         ClinicalHistory history = ClinicalHistory.builder()
@@ -104,6 +112,14 @@ public class ClinicalHistoryService {
         if (request.appointmentId() != null) {
             appointment = appointmentRepository.findById(request.appointmentId())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Consulta não encontrada"));
+
+            if (appointment.getPet() == null || !appointment.getPet().getId().equals(pet.getId())) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "A consulta informada não pertence ao pet especificado");
+            }
+
+            if (appointment.getVeterinarian() == null || !appointment.getVeterinarian().getId().equals(veterinarian.getId())) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O veterinário da consulta não corresponde ao veterinário informado");
+            }
         }
 
         history.setPet(pet);
