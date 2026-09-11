@@ -80,7 +80,7 @@ public class AuthController {
         return registerUserWithRole(data, "ADMIN");
     }
 
-    private ResponseEntity<Void> registerUserWithRole(RegisterRequest data, String roleName) {
+    private ResponseEntity registerUserWithRole(RegisterRequest data, String roleName) {
         if (this.appUserRepository.findByEmail(data.email()).isPresent()) {
             return ResponseEntity.badRequest().build();
         }
@@ -95,8 +95,9 @@ public class AuthController {
                 .fullName(data.fullName())
                 .email(data.email())
                 .passwordHash(encryptedPassword)
+                .phone(data.phoneNumber())
                 .status(AppUserStatus.ACTIVE)
-                .roles(new HashSet<Role>(Collections.singleton(role)))
+                .roles(new HashSet(Collections.singleton(role)))
                 .createdAt(now)
                 .updatedAt(now)
                 .build();
