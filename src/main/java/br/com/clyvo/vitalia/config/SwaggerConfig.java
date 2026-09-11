@@ -18,7 +18,7 @@ public class SwaggerConfig {
                 .info(new Info()
                         .title("Vitalia API")
                         .version("1.0")
-                        .description("API para gerenciamento de contas, responsáveis e pets do sistema Vitalia.")
+                        .description("API operacional do Vitalia responsável por autenticação, usuários, pets, consultas, históricos clínicos e alertas.")
                         .contact(new Contact()
                                 .name("Suporte Clyvo")
                                 .email("contatoVitalia@gmail.com")))
