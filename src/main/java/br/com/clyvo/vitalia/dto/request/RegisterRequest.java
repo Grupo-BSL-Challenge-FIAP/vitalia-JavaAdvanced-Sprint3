@@ -1,8 +1,6 @@
 package br.com.clyvo.vitalia.dto.request;
 
-import br.com.clyvo.vitalia.enums.Role;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 
 public record RegisterRequest(
         @NotBlank(message = "O nome completo é obrigatório")
