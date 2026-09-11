@@ -5,12 +5,34 @@
     "description": "API para monitoramento inteligente e gerenciamento de pets, agendamentos, históricos e alertas do sistema Vitalia.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{jwtToken}}",
+        "type": "string"
+      }
+    ]
+  },
   "item": [
     {
       "name": "Auth",
       "item": [
         {
           "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const response = pm.response.json();",
+                  "pm.collectionVariables.set(\"jwtToken\", response.token);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -31,9 +53,7 @@
           "name": "Me (Dados do usuário autenticado)",
           "request": {
             "method": "GET",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
-            ],
+            "header": [],
             "url": {
               "raw": "{{baseUrl}}/auth/me",
               "host": ["{{baseUrl}}"],
@@ -64,12 +84,11 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+              { "key": "Content-Type", "value": "application/json" }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"fullName\": \"Administrador\",\n  \"email\": \"admin@vitalia.com\",\n  \"password\": \"Admin@123\",\n  \"phone\": \"(11) 99999-9999\"\n}"
+              "raw": "{\n  \"fullName\": \"Administrador\",\n  \"email\": \"admin@vitalia.com\",\n  \"password\": \"Admin@123\",\n  \"phoneNumber\": \"(11) 99999-9999\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/auth/register/admin",
@@ -87,7 +106,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"fullName\": \"Tutor Exemplo\",\n  \"email\": \"tutor@vitalia.com\",\n  \"password\": \"Tutor@123\",\n  \"phone\": \"(11) 97777-6666\"\n}"
+              "raw": "{\n  \"fullName\": \"Tutor Exemplo\",\n  \"email\": \"tutor@vitalia.com\",\n  \"password\": \"Tutor@123\",\n  \"phoneNumber\": \"(11) 97777-6666\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/auth/register/tutor",
@@ -101,12 +120,11 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+              { "key": "Content-Type", "value": "application/json" }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"fullName\": \"Dr. Ricardo Santos\",\n  \"email\": \"vet@vitalia.com\",\n  \"password\": \"Vet@123\",\n  \"phone\": \"(11) 96666-5555\"\n}"
+              "raw": "{\n  \"fullName\": \"Dr. Ricardo Santos\",\n  \"email\": \"vet@vitalia.com\",\n  \"password\": \"Vet@123\",\n  \"phoneNumber\": \"(11) 96666-5555\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/auth/register/vet",
@@ -124,9 +142,7 @@
           "name": "Listar Todos",
           "request": {
             "method": "GET",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
-            ],
+            "header": [],
             "url": {
               "raw": "{{baseUrl}}/users",
               "host": ["{{baseUrl}}"],
@@ -138,9 +154,7 @@
           "name": "Buscar por ID",
           "request": {
             "method": "GET",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
-            ],
+            "header": [],
             "url": {
               "raw": "{{baseUrl}}/users/1",
               "host": ["{{baseUrl}}"],
@@ -157,9 +171,7 @@
           "name": "Listar Pets (Paginado)",
           "request": {
             "method": "GET",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
-            ],
+            "header": [],
             "url": {
               "raw": "{{baseUrl}}/pets?page=0&size=10",
               "host": ["{{baseUrl}}"],
@@ -176,8 +188,7 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+              { "key": "Content-Type", "value": "application/json" }
             ],
             "body": {
               "mode": "raw",
@@ -194,9 +205,7 @@
           "name": "Listar Meus Pets",
           "request": {
             "method": "GET",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
-            ],
+            "header": [],
             "url": {
               "raw": "{{baseUrl}}/pets/my-pets",
               "host": ["{{baseUrl}}"],
@@ -208,9 +217,7 @@
           "name": "Buscar Pet por Nome",
           "request": {
             "method": "GET",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
-            ],
+            "header": [],
             "url": {
               "raw": "{{baseUrl}}/pets/search/name?name=Thor",
               "host": ["{{baseUrl}}"],
@@ -230,9 +237,7 @@
           "name": "Listar Agendamentos",
           "request": {
             "method": "GET",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
-            ],
+            "header": [],
             "url": {
               "raw": "{{baseUrl}}/appointments",
               "host": ["{{baseUrl}}"],
@@ -245,8 +250,7 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+              { "key": "Content-Type", "value": "application/json" }
             ],
             "body": {
               "mode": "raw",
@@ -268,9 +272,7 @@
           "name": "Listar Históricos Clínicos",
           "request": {
             "method": "GET",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
-            ],
+            "header": [],
             "url": {
               "raw": "{{baseUrl}}/clinical-histories",
               "host": ["{{baseUrl}}"],
@@ -283,8 +285,7 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+              { "key": "Content-Type", "value": "application/json" }
             ],
             "body": {
               "mode": "raw",
@@ -306,9 +307,7 @@
           "name": "Listar Alertas",
           "request": {
             "method": "GET",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
-            ],
+            "header": [],
             "url": {
               "raw": "{{baseUrl}}/alerts",
               "host": ["{{baseUrl}}"],
@@ -321,8 +320,7 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+              { "key": "Content-Type", "value": "application/json" }
             ],
             "body": {
               "mode": "raw",
@@ -345,7 +343,7 @@
     },
     {
       "key": "jwtToken",
-      "value": "SEU_TOKEN_AQUI"
+      "value": ""
     }
   ]
 }
