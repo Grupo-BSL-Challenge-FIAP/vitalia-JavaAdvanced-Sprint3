@@ -55,7 +55,12 @@ public class AuthController {
 
         MeResponse response = new MeResponse(
                 user.getId(),
+                user.getFullName(),
                 user.getEmail(),
+                user.getPhone(),
+                user.getCpf(),
+                user.getDateOfBirth(),
+                user.getAddress(),
                 user.getRoles()
         );
 

@@ -6,6 +6,8 @@ import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Set;
@@ -78,4 +80,15 @@ public class AppUser implements UserDetails {
 
     @Override
     public boolean isEnabled() { return status == AppUserStatus.ACTIVE; }
+
+    @Column(name = "CPF", length = 14, unique = true)
+    private String cpf;
+
+    @Column(name = "DATE_OF_BIRTH")
+    private LocalDate dateOfBirth;
+
+    @Column(name = "ADDRESS", length = 255)
+    private String address;
+
+
 }
