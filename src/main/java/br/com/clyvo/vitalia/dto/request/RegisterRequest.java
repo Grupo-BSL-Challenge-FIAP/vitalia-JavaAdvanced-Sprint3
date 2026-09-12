@@ -4,6 +4,8 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
+import java.time.LocalDate;
+
 public record RegisterRequest(
         @NotBlank(message = "O nome completo é obrigatório")
         String fullName,
@@ -16,5 +18,11 @@ public record RegisterRequest(
         String password,
 
         @Size(max = 30)
-        String phoneNumber
+        String phoneNumber,
+
+        String cpf,
+
+        LocalDate dateOfBirth,
+
+        String address
 ) {}

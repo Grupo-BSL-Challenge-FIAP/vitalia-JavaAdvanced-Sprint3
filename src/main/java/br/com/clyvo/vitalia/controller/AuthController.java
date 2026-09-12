@@ -25,6 +25,7 @@ import br.com.clyvo.vitalia.entity.Role;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/auth")
@@ -101,8 +102,11 @@ public class AuthController {
                 .email(data.email())
                 .passwordHash(encryptedPassword)
                 .phone(data.phoneNumber())
+                .cpf(data.cpf())
+                .dateOfBirth(data.dateOfBirth())
+                .address(data.address())
                 .status(AppUserStatus.ACTIVE)
-                .roles(new HashSet(Collections.singleton(role)))
+                .roles(new HashSet<>(Set.of(role)))
                 .createdAt(now)
                 .updatedAt(now)
                 .build();
