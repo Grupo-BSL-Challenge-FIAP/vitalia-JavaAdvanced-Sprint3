@@ -1,5 +1,7 @@
 package br.com.clyvo.vitalia.dto.response;
 
+import br.com.clyvo.vitalia.entity.Role;
+
 import java.time.LocalDate;
 import java.util.Set;
 
@@ -11,5 +13,5 @@ public record MeResponse(
         String cpf,
         LocalDate dateOfBirth,
         String address,
-        Set roles
+        Set<Role> roles
 ) {}
