@@ -24,62 +24,315 @@ public class SecurityConfig {
     private final SecurityFilter securityFilter;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+    public SecurityFilterChain securityFilterChain(
+            HttpSecurity httpSecurity
+    ) throws Exception {
+
         return httpSecurity
                 .csrf(csrf -> csrf.disable())
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(authorize -> authorize
-                        // Rotas públicas de autenticação e documentação
-                        .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/auth/register/tutor").permitAll()
-                        .requestMatchers(HttpMethod.GET,"/species/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/auth/register/vet").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/auth/register/admin").hasRole("ADMIN")
-                        .requestMatchers("/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-                        .requestMatchers("/error").permitAll()
 
-                        // 1. Restrição de Usuários (/users/**) apenas para ADMIN
-                        .requestMatchers("/users/**").hasRole("ADMIN")
-
-                        // Permissões de Pets
-                        .requestMatchers(HttpMethod.GET, "/pets/my-pets").hasRole("TUTOR")
-                        .requestMatchers(HttpMethod.GET, "/pets/search/name").hasAnyRole("VETERINARIAN", "ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/pets/{id}").hasAnyRole("TUTOR", "VETERINARIAN", "ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/pets").hasAnyRole("VETERINARIAN", "ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/pets/**").hasAnyRole("TUTOR", "ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/pets/**").hasAnyRole("TUTOR", "ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/pets/**").hasAnyRole("TUTOR", "ADMIN")
-
-                        // 2. Revisão de Clinical Histories (POST, PUT, DELETE para VETERINARIAN ou ADMIN)
-                        .requestMatchers(HttpMethod.POST, "/clinical-histories/**").hasAnyRole("VETERINARIAN", "ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/clinical-histories/**").hasAnyRole("VETERINARIAN", "ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/clinical-histories/**").hasAnyRole("VETERINARIAN", "ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/clinical-histories/**").hasAnyRole("TUTOR", "VETERINARIAN", "ADMIN")
-
-                        // 3. Revisão de Alerts (Modificações restritas a VETERINARIAN ou ADMIN)
-                        .requestMatchers(HttpMethod.POST, "/alerts/**").hasAnyRole("VETERINARIAN", "ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/alerts/**").hasAnyRole("VETERINARIAN", "ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/alerts/**").hasAnyRole("VETERINARIAN", "ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/alerts/**").hasAnyRole("TUTOR", "VETERINARIAN", "ADMIN")
-
-                        // Permissões de Consultas (Appointments)
-                        .requestMatchers(HttpMethod.GET, "/appointments/pet/**").hasAnyRole("TUTOR", "VETERINARIAN", "ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/appointments").hasAnyRole("VETERINARIAN", "ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/appointments/**").hasAnyRole("TUTOR", "VETERINARIAN", "ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/appointments/**").hasAnyRole("VETERINARIAN", "ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/appointments/**").hasAnyRole("VETERINARIAN", "ADMIN")
-
-                        // Qualquer outra requisição precisa estar autenticada
-                        .anyRequest().authenticated()
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(
+                                SessionCreationPolicy.STATELESS
+                        )
                 )
-                .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
+
+                .authorizeHttpRequests(authorize -> authorize
+
+                        /*
+                         * AUTENTICAÇÃO
+                         */
+
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/auth/login"
+                        ).permitAll()
+
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/auth/register"
+                        ).permitAll()
+
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/auth/register/tutor"
+                        ).permitAll()
+
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/auth/register/vet"
+                        ).hasRole("ADMIN")
+
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/auth/register/admin"
+                        ).hasRole("ADMIN")
+
+
+                        /*
+                         * ESPÉCIES E RAÇAS
+                         *
+                         * Públicas porque são utilizadas
+                         * durante o cadastro do usuário/pet.
+                         */
+
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/species/**"
+                        ).permitAll()
+
+
+                        /*
+                         * DOCUMENTAÇÃO
+                         */
+
+                        .requestMatchers(
+                                "/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html"
+                        ).permitAll()
+
+                        .requestMatchers(
+                                "/error"
+                        ).permitAll()
+
+
+                        /*
+                         * PERFIL DO PRÓPRIO USUÁRIO
+                         *
+                         * IMPORTANTE:
+                         * deve ficar ANTES de /users/**
+                         * porque /users/me também corresponde
+                         * ao padrão /users/**.
+                         */
+
+                        .requestMatchers(
+                                HttpMethod.PUT,
+                                "/users/me"
+                        ).hasAnyRole(
+                                "TUTOR",
+                                "VETERINARIAN",
+                                "ADMIN"
+                        )
+
+
+                        /*
+                         * USUÁRIOS
+                         *
+                         * As demais operações de /users/**
+                         * continuam exclusivas do ADMIN.
+                         */
+
+                        .requestMatchers(
+                                "/users/**"
+                        ).hasRole("ADMIN")
+
+
+                        /*
+                         * PETS
+                         */
+
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/pets/my-pets"
+                        ).hasRole("TUTOR")
+
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/pets/search/name"
+                        ).hasAnyRole(
+                                "VETERINARIAN",
+                                "ADMIN"
+                        )
+
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/pets/{id}"
+                        ).hasAnyRole(
+                                "TUTOR",
+                                "VETERINARIAN",
+                                "ADMIN"
+                        )
+
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/pets"
+                        ).hasAnyRole(
+                                "VETERINARIAN",
+                                "ADMIN"
+                        )
+
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/pets/**"
+                        ).hasAnyRole(
+                                "TUTOR",
+                                "ADMIN"
+                        )
+
+                        .requestMatchers(
+                                HttpMethod.PUT,
+                                "/pets/**"
+                        ).hasAnyRole(
+                                "TUTOR",
+                                "ADMIN"
+                        )
+
+                        .requestMatchers(
+                                HttpMethod.DELETE,
+                                "/pets/**"
+                        ).hasAnyRole(
+                                "TUTOR",
+                                "ADMIN"
+                        )
+
+
+                        /*
+                         * HISTÓRICOS CLÍNICOS
+                         */
+
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/clinical-histories/**"
+                        ).hasAnyRole(
+                                "VETERINARIAN",
+                                "ADMIN"
+                        )
+
+                        .requestMatchers(
+                                HttpMethod.PUT,
+                                "/clinical-histories/**"
+                        ).hasAnyRole(
+                                "VETERINARIAN",
+                                "ADMIN"
+                        )
+
+                        .requestMatchers(
+                                HttpMethod.DELETE,
+                                "/clinical-histories/**"
+                        ).hasAnyRole(
+                                "VETERINARIAN",
+                                "ADMIN"
+                        )
+
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/clinical-histories/**"
+                        ).hasAnyRole(
+                                "TUTOR",
+                                "VETERINARIAN",
+                                "ADMIN"
+                        )
+
+
+                        /*
+                         * ALERTAS
+                         */
+
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/alerts/**"
+                        ).hasAnyRole(
+                                "VETERINARIAN",
+                                "ADMIN"
+                        )
+
+                        .requestMatchers(
+                                HttpMethod.PUT,
+                                "/alerts/**"
+                        ).hasAnyRole(
+                                "VETERINARIAN",
+                                "ADMIN"
+                        )
+
+                        .requestMatchers(
+                                HttpMethod.DELETE,
+                                "/alerts/**"
+                        ).hasAnyRole(
+                                "VETERINARIAN",
+                                "ADMIN"
+                        )
+
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/alerts/**"
+                        ).hasAnyRole(
+                                "TUTOR",
+                                "VETERINARIAN",
+                                "ADMIN"
+                        )
+
+
+                        /*
+                         * CONSULTAS
+                         */
+
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/appointments/pet/**"
+                        ).hasAnyRole(
+                                "TUTOR",
+                                "VETERINARIAN",
+                                "ADMIN"
+                        )
+
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/appointments"
+                        ).hasAnyRole(
+                                "VETERINARIAN",
+                                "ADMIN"
+                        )
+
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/appointments/**"
+                        ).hasAnyRole(
+                                "TUTOR",
+                                "VETERINARIAN",
+                                "ADMIN"
+                        )
+
+                        .requestMatchers(
+                                HttpMethod.PUT,
+                                "/appointments/**"
+                        ).hasAnyRole(
+                                "VETERINARIAN",
+                                "ADMIN"
+                        )
+
+                        .requestMatchers(
+                                HttpMethod.DELETE,
+                                "/appointments/**"
+                        ).hasAnyRole(
+                                "VETERINARIAN",
+                                "ADMIN"
+                        )
+
+
+                        /*
+                         * QUALQUER OUTRA ROTA
+                         */
+
+                        .anyRequest()
+                        .authenticated()
+                )
+
+                .addFilterBefore(
+                        securityFilter,
+                        UsernamePasswordAuthenticationFilter.class
+                )
+
                 .build();
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
-        return authenticationConfiguration.getAuthenticationManager();
+    public AuthenticationManager authenticationManager(
+            AuthenticationConfiguration authenticationConfiguration
+    ) throws Exception {
+
+        return authenticationConfiguration
+                .getAuthenticationManager();
     }
 
     @Bean
