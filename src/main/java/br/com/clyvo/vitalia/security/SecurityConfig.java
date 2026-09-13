@@ -71,9 +71,6 @@ public class SecurityConfig {
 
                         /*
                          * ESPÉCIES E RAÇAS
-                         *
-                         * Públicas porque são utilizadas
-                         * durante o cadastro do usuário/pet.
                          */
 
                         .requestMatchers(
@@ -101,13 +98,23 @@ public class SecurityConfig {
                          * PERFIL DO PRÓPRIO USUÁRIO
                          *
                          * IMPORTANTE:
-                         * deve ficar ANTES de /users/**
-                         * porque /users/me também corresponde
-                         * ao padrão /users/**.
+                         * essas regras precisam ficar
+                         * antes de /users/**
                          */
 
+                        // Editar a própria conta
                         .requestMatchers(
                                 HttpMethod.PUT,
+                                "/users/me"
+                        ).hasAnyRole(
+                                "TUTOR",
+                                "VETERINARIAN",
+                                "ADMIN"
+                        )
+
+                        // Excluir a própria conta
+                        .requestMatchers(
+                                HttpMethod.DELETE,
                                 "/users/me"
                         ).hasAnyRole(
                                 "TUTOR",
