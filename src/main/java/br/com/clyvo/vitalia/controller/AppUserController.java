@@ -1,6 +1,7 @@
 package br.com.clyvo.vitalia.controller;
 
 import br.com.clyvo.vitalia.dto.request.AppUserRequest;
+import br.com.clyvo.vitalia.dto.request.UpdateMeRequest;
 import br.com.clyvo.vitalia.dto.response.AppUserResponse;
 import br.com.clyvo.vitalia.service.AppUserService;
 import jakarta.validation.Valid;
@@ -8,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -16,28 +18,61 @@ import org.springframework.web.bind.annotation.*;
 public class AppUserController {
 
     private final AppUserService service;
-    
+
     @GetMapping
-    public ResponseEntity<Page<AppUserResponse>> findAll(Pageable pageable) {
-        Page<AppUserResponse> response = service.findAll(pageable);
+    public ResponseEntity<Page<AppUserResponse>> findAll(
+            Pageable pageable
+    ) {
+        Page<AppUserResponse> response =
+                service.findAll(pageable);
+
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<AppUserResponse> findById(@PathVariable Long id) {
-        AppUserResponse response = service.findById(id);
+    public ResponseEntity<AppUserResponse> findById(
+            @PathVariable Long id
+    ) {
+        AppUserResponse response =
+                service.findById(id);
+
         return ResponseEntity.ok(response);
     }
 
+    @PutMapping("/me")
+    public ResponseEntity<Void> updateMe(
+            Authentication authentication,
+            @RequestBody @Valid UpdateMeRequest request
+    ) {
+        service.updateMe(
+                authentication.getName(),
+                request
+        );
+
+        return ResponseEntity
+                .noContent()
+                .build();
+    }
+
     @PutMapping("{id}")
-    public ResponseEntity<AppUserResponse> update(@PathVariable Long id, @RequestBody @Valid AppUserRequest request) {
-        AppUserResponse response = service.update(id, request);
+    public ResponseEntity<AppUserResponse> update(
+            @PathVariable Long id,
+            @RequestBody @Valid AppUserRequest request
+    ) {
+        AppUserResponse response =
+                service.update(id, request);
+
         return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(
+            @PathVariable Long id
+    ) {
         service.delete(id);
-        return ResponseEntity.noContent().build();
+
+        return ResponseEntity
+                .noContent()
+                .build();
     }
 }
