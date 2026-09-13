@@ -75,4 +75,17 @@ public class AppUserController {
                 .noContent()
                 .build();
     }
+
+    @DeleteMapping("/me")
+    public ResponseEntity<Void> deleteMe(
+            Authentication authentication
+    ) {
+        service.deleteMe(
+                authentication.getName()
+        );
+
+        return ResponseEntity
+                .noContent()
+                .build();
+    }
 }
