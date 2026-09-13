@@ -12,7 +12,13 @@ import org.springframework.stereotype.Repository;
 public interface PetRepository extends JpaRepository<Pet, Long> {
 
     @Query("SELECT p FROM Pet p WHERE p.owner.id = :ownerId")
-    Page<Pet> findByOwnerUserId(@Param("ownerId") Long ownerId, Pageable pageable);
+    Page<Pet> findByOwnerUserId(
+            @Param("ownerId") Long ownerId,
+            Pageable pageable
+    );
 
-    Page<Pet> findByNameContainingIgnoreCase(String name, Pageable pageable);
+    Page<Pet> findByNameContainingIgnoreCase(
+            String name,
+            Pageable pageable
+    );
 }
