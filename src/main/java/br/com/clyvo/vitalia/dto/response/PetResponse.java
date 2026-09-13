@@ -11,5 +11,9 @@ public record PetResponse(
         BigDecimal weightKg,
         String status,
         Long ownerUserId,
-        Long breedId
-) {}
+        Long breedId,
+        String breedName,
+        Long speciesId,
+        String speciesName
+) {
+}
