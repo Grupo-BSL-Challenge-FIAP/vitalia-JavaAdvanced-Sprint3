@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+import br.com.clyvo.vitalia.enums.AppUserStatus;
 
 import java.time.LocalDateTime;
 
@@ -83,6 +84,23 @@ public class AppUserService {
         repository.delete(
                 findUserById(id)
         );
+    }
+
+    @Transactional
+    public void deleteMe(String email) {
+        AppUser user = repository
+                .findByEmail(email)
+                .orElseThrow(() ->
+                        new ResponseStatusException(
+                                HttpStatus.NOT_FOUND,
+                                "Usuário não encontrado"
+                        )
+                );
+
+        user.setStatus(AppUserStatus.BLOCKED);
+        user.setUpdatedAt(LocalDateTime.now());
+
+        repository.save(user);
     }
 
     private AppUser findUserById(Long id) {
