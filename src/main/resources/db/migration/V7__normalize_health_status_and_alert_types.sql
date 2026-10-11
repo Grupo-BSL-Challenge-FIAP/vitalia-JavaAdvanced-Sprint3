@@ -1,0 +1,43 @@
+-- Normaliza tipos antigos de alerta.
+
+UPDATE TB_VITALIA_HEALTH_ALERT
+SET ALERT_TYPE = 'LOW_ACTIVITY'
+WHERE ALERT_TYPE = 'ACTIVITY';
+
+UPDATE TB_VITALIA_HEALTH_ALERT
+SET ALERT_TYPE = 'BEHAVIOR_CHANGE'
+WHERE ALERT_TYPE = 'BEHAVIOR';
+
+
+-- Normaliza o estado de saúde dos pets.
+
+UPDATE TB_VITALIA_PET
+SET STATUS = 'NORMAL';
+
+
+-- Alerta HIGH aberto tem prioridade e define o pet como RISK.
+
+UPDATE TB_VITALIA_PET P
+SET STATUS = 'RISK'
+WHERE EXISTS (
+    SELECT 1
+    FROM TB_VITALIA_HEALTH_ALERT A
+    WHERE A.PET_ID = P.PET_ID
+      AND A.STATUS = 'OPEN'
+      AND A.SEVERITY = 'HIGH'
+);
+
+
+-- Alerta LOW ou MEDIUM aberto define ATTENTION,
+-- desde que o pet não esteja em RISK.
+
+UPDATE TB_VITALIA_PET P
+SET STATUS = 'ATTENTION'
+WHERE P.STATUS <> 'RISK'
+  AND EXISTS (
+    SELECT 1
+    FROM TB_VITALIA_HEALTH_ALERT A
+    WHERE A.PET_ID = P.PET_ID
+      AND A.STATUS = 'OPEN'
+      AND A.SEVERITY IN ('LOW', 'MEDIUM')
+);
