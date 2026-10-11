@@ -119,8 +119,7 @@ public class AppUserService {
         return new AppUserResponse(
                 user.getId(),
                 user.getFullName(),
-                user.getEmail(),
-                user.getPhone(),
+                user.getEmail(),                user.getPhone(),
                 user.getStatus().name(),
                 user.getCreatedAt()
         );

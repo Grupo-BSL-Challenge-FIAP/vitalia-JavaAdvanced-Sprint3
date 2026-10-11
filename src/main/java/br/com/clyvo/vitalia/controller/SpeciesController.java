@@ -3,11 +3,14 @@ package br.com.clyvo.vitalia.controller;
 import br.com.clyvo.vitalia.dto.response.BreedResponse;
 import br.com.clyvo.vitalia.dto.response.SpeciesResponse;
 import br.com.clyvo.vitalia.service.BreedService;
+import br.com.clyvo.vitalia.service.DatabaseProcedureService;
 import br.com.clyvo.vitalia.service.SpeciesService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,6 +26,7 @@ public class SpeciesController {
 
     private final SpeciesService speciesService;
     private final BreedService breedService;
+    private final DatabaseProcedureService databaseProcedureService;
 
     @GetMapping
     @Operation(
@@ -50,5 +54,21 @@ public class SpeciesController {
                         speciesId
                 )
         );
+    }
+
+    @PostMapping("/procedure")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(
+            summary = "Cadastra uma espécie utilizando package PL/SQL"
+    )
+    public ResponseEntity<Void> insertSpeciesByProcedure(
+            @RequestParam String name
+    ) {
+
+        databaseProcedureService.insertSpecies(name);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .build();
     }
 }
