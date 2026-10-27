@@ -2,7 +2,9 @@ package br.com.clyvo.vitalia.service;
 
 import br.com.clyvo.vitalia.dto.request.MeasurementRequest;
 import br.com.clyvo.vitalia.dto.response.MeasurementResponse;
+import br.com.clyvo.vitalia.entity.AiRecommendation;
 import br.com.clyvo.vitalia.entity.MeasurementEntity;
+import br.com.clyvo.vitalia.repository.AiRecommendationRepository;
 import br.com.clyvo.vitalia.repository.MeasurementRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +36,9 @@ public class MeasurementService {
     private static final Set<String> STATUS_VALIDOS = Set.of("NORMAL", "ATTENTION", "RISK");
 
     @Autowired
+    private AiRecommendationRepository aiRecommendationRepository;
+
+    @Autowired
     private AlertService alertService;
 
     @Autowired
@@ -55,6 +60,7 @@ public class MeasurementService {
     }
 
     public MeasurementResponse salvarEProcessarMedicao(MeasurementRequest dto) {
+
         MeasurementEntity entity = new MeasurementEntity();
         entity.setPetId(dto.getPetId());
         entity.setActivityLevel(dto.getActivityLevel());
@@ -67,7 +73,17 @@ public class MeasurementService {
 
         MeasurementEntity salva = measurementRepository.save(entity);
 
-        String statusIa = consultarIa(salva.getPetId(), dto);
+        Map<String, Object> respostaIa = consultarIaDetalhada(salva.getPetId(), dto);
+        String statusIa = (String) respostaIa.get("status");
+        String conteudoRecomendacao = (String) respostaIa.getOrDefault("recommendation", "Análise processada automaticamente pela IA.");
+
+        Double confidence = 0.0;
+        Object confObj = respostaIa.get("confidence");
+        if (confObj instanceof Number num) {
+            confidence = num.doubleValue();
+        }
+
+        Long alertId = null;
 
         if ("RISK".equalsIgnoreCase(statusIa)) {
             AlertRequest alertRequest = new AlertRequest(
@@ -77,8 +93,10 @@ public class MeasurementService {
                     AlertStatus.OPEN,
                     salva.getPetId()
             );
-
-            alertService.create(alertRequest);
+            var alertResponse = alertService.create(alertRequest);
+            if (alertResponse != null) {
+                alertId = alertResponse.id();
+            }
 
         } else if ("ATTENTION".equalsIgnoreCase(statusIa)) {
             AlertRequest alertRequest = new AlertRequest(
@@ -88,13 +106,29 @@ public class MeasurementService {
                     AlertStatus.OPEN,
                     salva.getPetId()
             );
-
-            alertService.create(alertRequest);
+            var alertResponse = alertService.create(alertRequest);
+            if (alertResponse != null) {
+                alertId = alertResponse.id();
+            }
         }
+
+        if (statusIa != null) {
+            AiRecommendation recommendation = new AiRecommendation();
+            recommendation.setPetId(salva.getPetId());
+            recommendation.setAlertId(alertId);
+            recommendation.setRecommendationType(statusIa);
+            recommendation.setContent(conteudoRecomendacao);
+            recommendation.setConfidence(confidence);
+            recommendation.setCreatedAt(LocalDateTime.now());
+            recommendation.setStatus("ACTIVE");
+
+            aiRecommendationRepository.save(recommendation);
+        }
+
         return new MeasurementResponse(salva.getId(), salva.getPetId(), statusIa, statusIa != null);
     }
 
-    private String consultarIa(Long petId, MeasurementRequest dto) {
+    private Map<String, Object> consultarIaDetalhada(Long petId, MeasurementRequest dto) {
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.setBearerAuth(aiToken);
@@ -107,15 +141,12 @@ public class MeasurementService {
                     new ParameterizedTypeReference<Map<String, Object>>() {},
                     petId);
 
-            Object status = resposta.getBody() == null ? null : resposta.getBody().get("status");
-            if (status instanceof String s && STATUS_VALIDOS.contains(s)) {
-                return s;
+            if (resposta.getBody() != null) {
+                return resposta.getBody();
             }
-            log.warn("API de IA retornou status fora do contrato: {}", status);
-            return null;
         } catch (RestClientException e) {
             log.warn("API de IA indisponível para o pet {}: {}", petId, e.getMessage());
-            return null;
         }
+        return Map.of();
     }
 }
