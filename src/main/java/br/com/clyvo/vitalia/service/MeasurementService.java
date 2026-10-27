@@ -18,6 +18,10 @@ import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+import br.com.clyvo.vitalia.dto.request.AlertRequest;
+import br.com.clyvo.vitalia.enums.AlertType;
+import br.com.clyvo.vitalia.enums.RiskLevel;
+import br.com.clyvo.vitalia.enums.AlertStatus;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -28,6 +32,9 @@ public class MeasurementService {
 
     private static final Logger log = LoggerFactory.getLogger(MeasurementService.class);
     private static final Set<String> STATUS_VALIDOS = Set.of("NORMAL", "ATTENTION", "RISK");
+
+    @Autowired
+    private AlertService alertService;
 
     @Autowired
     private MeasurementRepository measurementRepository;
@@ -61,6 +68,29 @@ public class MeasurementService {
         MeasurementEntity salva = measurementRepository.save(entity);
 
         String statusIa = consultarIa(salva.getPetId(), dto);
+
+        if ("RISK".equalsIgnoreCase(statusIa)) {
+            AlertRequest alertRequest = new AlertRequest(
+                    AlertType.GENERAL,
+                    "Alerta crítico: A IA identificou alterações de alto risco nas medições do pet.",
+                    RiskLevel.HIGH,
+                    AlertStatus.OPEN,
+                    salva.getPetId()
+            );
+
+            alertService.create(alertRequest);
+
+        } else if ("ATTENTION".equalsIgnoreCase(statusIa)) {
+            AlertRequest alertRequest = new AlertRequest(
+                    AlertType.GENERAL,
+                    "Atenção necessária: A IA detetou variações atípicas no comportamento do pet.",
+                    RiskLevel.MEDIUM,
+                    AlertStatus.OPEN,
+                    salva.getPetId()
+            );
+
+            alertService.create(alertRequest);
+        }
         return new MeasurementResponse(salva.getId(), salva.getPetId(), statusIa, statusIa != null);
     }
 

@@ -15,33 +15,30 @@ public class MeasurementEntity {
     @Column(name = "PET_ID")
     private Long petId;
 
-    @Column(name = "ACTIVITY_LEVEL", columnDefinition = "NUMBER")
+    @Column(name = "ACTIVITY_LEVEL")
     private Double activityLevel;
 
-    @Column(name = "SLEEP_HOURS", columnDefinition = "NUMBER")
+    @Column(name = "SLEEP_HOURS")
     private Double sleepHours;
 
-    @Column(name = "HEART_RATE_BPM", columnDefinition = "NUMBER")
+    @Column(name = "HEART_RATE_BPM")
     private Double heartRate;
 
-    @Column(name = "RESPIRATORY_RATE", columnDefinition = "NUMBER")
+    @Column(name = "RESPIRATORY_RATE")
     private Double respiratoryRate;
 
-    @Column(name = "TEMPERATURE_C", columnDefinition = "NUMBER")
+    @Column(name = "TEMPERATURE_C")
     private Double temperature;
 
-    @Column(name = "BEHAVIOR_SCORE", columnDefinition = "NUMBER")
+    @Column(name = "BEHAVIOR_SCORE")
     private Double behaviorScore;
 
     @Column(name = "MEASUREMENT_DATE")
     private LocalDateTime measurementDate;
 
-    // Getters e Setters
+    // Getters e Setters ...
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
-
-    public LocalDateTime getMeasurementDate() { return measurementDate; }
-    public void setMeasurementDate(LocalDateTime measurementDate) { this.measurementDate = measurementDate; }
 
     public Long getPetId() { return petId; }
     public void setPetId(Long petId) { this.petId = petId; }
@@ -63,4 +60,7 @@ public class MeasurementEntity {
 
     public Double getBehaviorScore() { return behaviorScore; }
     public void setBehaviorScore(Double behaviorScore) { this.behaviorScore = behaviorScore; }
+
+    public LocalDateTime getMeasurementDate() { return measurementDate; }
+    public void setMeasurementDate(LocalDateTime measurementDate) { this.measurementDate = measurementDate; }
 }
